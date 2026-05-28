@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои поездки</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">TripSplit</div>
+    <div class="nav-links">
+        <form th:action="@{/logout}" method="post"><button class="secondary-button" type="submit">Выйти</button></form>
+    </div>
+</nav>
+
+<div class="container large">
+    <h1>Мои поездки</h1>
+
+    <form th:action="@{/trips}" method="get" class="trip-form">
+        <div class="form-group">
+            <label>Поиск по месту</label>
+            <input type="text" name="destination" th:value="${destination}" placeholder="Например: Италия">
+        </div>
+        <button type="submit">Найти</button>
+    </form>
+
+    <hr>
+    <h2>Создать поездку</h2>
+
+    <form th:action="@{/trips}" th:object="${tripRequest}" method="post" class="trip-form">
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" th:field="*{title}" placeholder="Летнее путешествие">
+            <p class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+        </div>
+        <div class="form-group"><label>Место</label><input type="text" th:field="*{destination}" placeholder="Италия"></div>
+        <div class="form-group"><label>Дата начала</label><input type="date" th:field="*{startDate}"></div>
+        <div class="form-group"><label>Дата окончания</label><input type="date" th:field="*{endDate}"><p class="error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></p></div>
+        <div class="form-group"><label>Ссылка на фото</label><input type="text" th:field="*{imageUrl}" placeholder="https://..."></div>
+        <div class="form-group"><label>Описание</label><input type="text" th:field="*{description}" placeholder="Краткое описание"></div>
+        <button type="submit">Создать поездку</button>
+    </form>
+
+    <hr>
+    <h2>Ваши поездки</h2>
+    <div th:if="${#lists.isEmpty(trips)}"><p>Поездок пока нет.</p></div>
+
+    <div class="trip-card" th:each="trip : ${trips}">
+        <img class="trip-image" th:if="${trip.imageUrl != null and !trip.imageUrl.isBlank()}" th:src="${trip.imageUrl}" alt="Фото поездки">
+        <h3 th:text="${trip.title}">Название</h3>
+        <p><b>Место:</b> <span th:text="${trip.destination}">Место</span></p>
+        <p><b>Даты:</b> <span th:text="${trip.startDate}">Начало</span> — <span th:text="${trip.endDate}">Конец</span></p>
+        <p th:text="${trip.description}">Описание</p>
+        <a class="link-button" th:href="@{/trips/{id}(id=${trip.id})}">Открыть поездку</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали поездки</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">TripSplit</div>
+    <div class="nav-links">
+        <a th:href="@{/trips}">Мои поездки</a>
+        <form th:action="@{/logout}" method="post"><button class="secondary-button" type="submit">Выйти</button></form>
+    </div>
+</nav>
+
+<div class="container large">
+    <a th:href="@{/trips}">← Назад к поездкам</a>
+
+    <img class="trip-image" th:if="${trip.imageUrl != null and !trip.imageUrl.isBlank()}" th:src="${trip.imageUrl}" alt="Фото поездки">
+
+    <h1 th:text="${trip.title}">Название поездки</h1>
+
+    <a th:if="${isOwner}" class="link-button" th:href="@{/trips/{id}/edit(id=${trip.id})}">Редактировать поездку</a>
+
+    <form th:if="${isOwner}" th:action="@{/trips/{id}/delete(id=${trip.id})}" method="post" style="margin-top: 10px;" onsubmit="return confirm('Вы точно хотите удалить поездку? Все расходы и комментарии тоже удалятся.');">
+        <button class="danger-button" type="submit">Удалить поездку</button>
+    </form>
+
+    <p><b>Место:</b> <span th:text="${trip.destination}">Место</span></p>
+    <p><b>Даты:</b> <span th:text="${trip.startDate}">Начало</span> — <span th:text="${trip.endDate}">Конец</span></p>
+    <p th:text="${trip.description}">Описание</p>
+
+    <div class="summary-card">
+        <h2>Всего потрачено</h2>
+        <p>
+            <span th:text="${total}">0</span>
+            USD
+        </p>
+    </div>
+
+    <div th:if="${isOwner}" class="summary-card">
+        <h2>Добавить участника</h2>
+        <form th:action="@{/trips/{id}/participants(id=${trip.id})}" th:object="${participantRequest}" method="post">
+            <div class="form-group">
+                <label>Email пользователя</label>
+                <input type="email" th:field="*{email}" placeholder="friend@example.com">
+                <p class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+            </div>
+            <button type="submit">Добавить участника</button>
+        </form>
+    </div>
+
+    <h2>Участники</h2>
+    <div th:if="${#lists.isEmpty(participants)}"><p>Участников пока нет.</p></div>
+    <div class="trip-card" th:each="participant : ${participants}">
+        <p th:text="${participant.user.username}">Имя</p>
+        <p th:text="${participant.user.email}">email</p>
+    </div>
+
+    <hr>
+    <h2>Добавить расход</h2>
+
+    <form th:action="@{/trips/{id}/expenses(id=${trip.id})}" th:object="${expenseRequest}" method="post">
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" th:field="*{title}" placeholder="Отель, еда, билеты">
+            <p class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+        </div>
+        <div class="form-group">
+            <label>Сумма в USD</label>
+            <input type="number" step="0.01" th:field="*{amount}" placeholder="100.00">
+            <p class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></p>
+        </div>
+        <button type="submit">Добавить расход</button>
+    </form>
+
+    <hr>
+    <h2>Расходы</h2>
+    <div th:if="${#lists.isEmpty(expenses)}"><p>Расходов пока нет.</p></div>
+
+    <div class="trip-card" th:each="expense : ${expenses}">
+        <h3 th:text="${expense.title}">Расход</h3>
+
+        <p>
+            <b>Сумма в USD:</b>
+            <span th:text="${expense.amount}">0</span>
+        </p>
+
+        <p th:if="${expense.amountInEur != null}">
+            <b>В EUR:</b>
+            ≈ <span th:text="${expense.amountInEur}">0</span>
+        </p>
+
+        <p>
+            <b>Оплатил:</b>
+            <span th:text="${expense.payerName}">Пользователь</span>
+        </p>
+        <form th:if="${expense.payerEmail == #authentication.name}"
+              th:action="@{/trips/{tripId}/expenses/{expenseId}/delete(tripId=${trip.id}, expenseId=${expense.id})}"
+              method="post"
+              onsubmit="return confirm('Вы точно хотите удалить этот расход?');">
+
+            <button class="danger-button" type="submit">
+                Удалить расход
+            </button>
+        </form>
+    </div>
+
+    <hr>
+    <h2>Кто кому должен</h2>
+    <div th:if="${#lists.isEmpty(debts)}"><p>Долгов пока нет.</p></div>
+    <div class="trip-card" th:each="debt : ${debts}">
+        <p><b th:text="${debt.fromUser}">Пользователь</b> должен(на) <b th:text="${debt.toUser}">Пользователь</b></p>
+        <p><b>Сумма:</b> <span th:text="${debt.amount}">0</span></p>
+    </div>
+
+    <hr>
+    <h2>Обсуждение поездки</h2>
+    <form th:action="@{/trips/{id}/comments(id=${trip.id})}" th:object="${commentRequest}" method="post">
+        <div class="form-group">
+            <label>Комментарий</label>
+            <input type="text" th:field="*{text}" placeholder="Напишите сообщение...">
+            <p class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></p>
+        </div>
+        <button type="submit">Отправить</button>
+    </form>
+
+    <div th:if="${#lists.isEmpty(comments)}"><p>Комментариев пока нет.</p></div>
+    <div class="comment-card" th:each="comment : ${comments}">
+        <p class="comment-author" th:text="${comment.author.username}">Пользователь</p>
+        <p th:text="${comment.text}">Комментарий</p>
+        <p class="comment-date" th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">Дата</p>
+    </div>
+</div>
+</body>
+</html>

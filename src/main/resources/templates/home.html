@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>TripSplit</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">TripSplit</div>
+    <div class="nav-links">
+        <a th:href="@{/login}">Войти</a>
+        <a class="nav-button" th:href="@{/register}">Регистрация</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Планируйте поездки и делите расходы вместе</h1>
+        <p>Создавайте совместные поездки, добавляйте участников, фиксируйте расходы и смотрите, кто кому должен.</p>
+        <div class="hero-actions">
+            <a class="main-button" th:href="@{/register}">Начать</a>
+            <a class="outline-button" th:href="@{/login}">Войти</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature-card"><h3>Поездки</h3><p>Создавайте поездки и добавляйте участников по email.</p></div>
+    <div class="feature-card"><h3>Расходы</h3><p>Фиксируйте траты на билеты, еду, отели и другие нужды.</p></div>
+    <div class="feature-card"><h3>Долги</h3><p>Система автоматически рассчитывает, кто кому должен.</p></div>
+</section>
+</body>
+</html>
