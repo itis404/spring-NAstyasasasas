@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование поездки</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container large">
+    <a th:href="@{/trips/{id}(id=${trip.id})}">← Назад к поездке</a>
+    <h1>Редактирование поездки</h1>
+
+    <form th:action="@{/trips/{id}/edit(id=${trip.id})}" th:object="${tripRequest}" method="post">
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" th:field="*{title}">
+            <p class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+        </div>
+        <div class="form-group"><label>Место</label><input type="text" th:field="*{destination}"></div>
+        <div class="form-group"><label>Дата начала</label><input type="date" th:field="*{startDate}"></div>
+        <div class="form-group"><label>Дата окончания</label><input type="date" th:field="*{endDate}"><p class="error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></p></div>
+        <div class="form-group"><label>Ссылка на фото</label><input type="text" th:field="*{imageUrl}"></div>
+        <div class="form-group"><label>Описание</label><input type="text" th:field="*{description}"></div>
+        <button type="submit">Сохранить изменения</button>
+    </form>
+</div>
+</body>
+</html>

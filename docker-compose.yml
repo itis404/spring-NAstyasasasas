@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    container_name: tripsplit-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tripsplit
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_CACHE_TYPE: redis
+
+  postgres:
+    image: postgres:14
+    container_name: tripsplit-postgres
+    environment:
+      POSTGRES_DB: tripsplit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: tripsplit-redis
+    ports:
+      - "6379:6379"
